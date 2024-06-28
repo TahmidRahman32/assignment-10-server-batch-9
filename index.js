@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require('cors');
 require("dotenv").config();
 const port = process.env.PORT || 5000;
@@ -31,6 +31,8 @@ async function run() {
 
         const database = client.db("Gallery");
         const collection = database.collection("art");
+        const collection2 = database.collection("allArt");
+        const addToCardCollection = database.collection("addCraft");
       app.get('/craft', async(req, res)=>{
          const source = collection.find();
          const result = await source.toArray();
@@ -40,9 +42,79 @@ async function run() {
        app.post('/craft', async(req, res)=>{
          const craft = req.body;
          console.log(craft);
-         const result = await collection.insertOne(craft)
+         const result = await collection2.insertOne(craft)
          res.send(result)
        })
+       app.get('/craft/:id',async(req, res)=>{
+         const id = req.params.id;
+         const query = {_id: new ObjectId(id)}
+         const result = await collection.findOne(query);
+         res.send(result)
+       })
+
+      //  add to card crud 
+
+      app.post('/myCraft',async (req,res)=>{
+          const addCraft = req.body;
+          const result = await addToCardCollection.insertOne(addCraft)
+          res.send(result)
+      })
+
+      app.get('/myCraft',async(req,res)=>{
+         const courser = addToCardCollection.find();
+         const result = await courser.toArray();
+         res.send(result)
+      })
+
+      app.delete('/myCraft/:id',async(req,res)=>{
+        const id = req.params.id;
+        const query = {_id: id};
+        console.log(query);
+        const result = await addToCardCollection.deleteOne(query);
+        res.send(result)
+      })
+      // all data crud
+      app.get('/allArt', async(req, res)=>{
+         const courser = collection2.find();
+         const result = await courser.toArray();
+         res.send(result);
+      })
+
+      app.get('/allArt/:id',async(req, res)=>{
+         const id = req.params.id;
+         const query = {_id: new ObjectId(id)};
+         const result = await collection2.findOne(query);
+         res.send(result);
+      })
+
+      app.put('/allArt/:id',async(req, res)=>{
+         const id = req.params.id;
+         const filter = {_id: new ObjectId(id)};
+         const options = { upsert: true };
+         const updateArt = req.body;
+         const Art = {
+            $set: {
+               url: updateArt.url,
+               item_name: updateArt.item_name,
+               subcategory_Name: updateArt.subcategory_Name,
+               description: updateArt.description,
+               rating: updateArt.rating,
+               processing_time: updateArt.processing_time,
+               customization: updateArt.customization,
+               stockStatus: updateArt.stockStatus,
+               price: updateArt.price,
+            },
+         };
+         const result = await collection2.updateOne(filter,Art, options);
+         res.send(result)
+      })
+
+      app.delete('/allArt/:id',async(req,res) =>{
+         const id = req.params.id;
+         const query = {_id: new ObjectId(id)};
+         const result = await collection2.deleteOne(query);
+         res.send(result);
+      })
 
 
       await client.db("admin").command({ ping: 1 });
