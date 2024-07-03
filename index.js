@@ -7,7 +7,7 @@ const port = process.env.PORT || 5000;
 
 app.use(
    cors({
-      origin:"http://localhost:5174",
+      origin: "http://localhost:5173",
       credentials: true,
    })
 );
@@ -29,7 +29,7 @@ const client = new MongoClient(uri, {
 async function run() {
    try {
       // Connect the client to the server	(optional starting in v4.7)
-      await client.connect();
+       client.connect();
       // Send a ping to confirm a successful connection
 
       const database = client.db("Gallery");
