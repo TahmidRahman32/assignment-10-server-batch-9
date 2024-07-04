@@ -7,7 +7,7 @@ const port = process.env.PORT || 5000;
 
 app.use(
    cors({
-      origin: "http://localhost:5173",
+      origin: ["https://assignment-10-8735b.web.app", "https://668582922b41ec5232db4aab--celadon-stardust-6b73ae.netlify.app", "http://localhost:5173"],
       credentials: true,
    })
 );
